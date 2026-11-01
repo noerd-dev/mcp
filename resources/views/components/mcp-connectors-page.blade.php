@@ -57,7 +57,13 @@ new class extends Component {
     }
 }; ?>
 
-<x-noerd::profile-layout>
+<x-noerd::page>
+    <x-slot:header>
+        <x-noerd::modal-title>
+            {{ __('My MCP Connectors') }}
+        </x-noerd::modal-title>
+    </x-slot:header>
+
     <x-noerd::profile-section>
         <h3 class="text-lg font-medium text-gray-900">{{ __('Available MCP servers') }}</h3>
         <p class="mt-1 text-sm text-zinc-600">
@@ -115,4 +121,4 @@ new class extends Component {
             @endforelse
         </ul>
     </x-noerd::profile-section>
-</x-noerd::profile-layout>
+</x-noerd::page>

@@ -65,8 +65,9 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
 - `noerd-mcp::mcp-connectors-page` (route `noerd-mcp.connectors`, `/noerd/user/mcp-connectors`,
   every person) is a page of the core's profile area: its route carries `['noerd', 'profile']`,
   the install/update command adds "My MCP Connectors" to `app-configs/profile/navigation.yml`
-  (`ensureProfileNavigation()`), and it renders `<x-noerd::profile-layout>`. It lists the servers the
-  selected tenant may use with the URL to add in an assistant, and the person's connected OAuth
+  (`ensureProfileNavigation()`), and it renders `<x-noerd::page>` with the title in its header
+  slot and one `<x-noerd::profile-section>` per block. It lists the servers the selected tenant
+  may use with the URL to add in an assistant, and the person's connected OAuth
   clients (`Services\McpConnectors::forUser()` — live access tokens grouped by client, last use
   from the log); "Disconnect" revokes all their tokens of that client, refresh tokens included
 - The admin components are registered with `ComponentAccessGuard` AND check `isAdmin()` in
