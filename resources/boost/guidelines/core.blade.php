@@ -63,8 +63,9 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
   `noerd-mcp.request.detail`, read-only); `noerd-mcp:prune-requests {--days=}` deletes old rows —
   the host schedules it
 - `noerd-mcp::mcp-connectors-page` (route `noerd-mcp.connectors`, `/noerd/user/mcp-connectors`,
-  every person) is a page of the core's profile area: registered on the `ProfileNavigationRegistry`
-  ("My MCP Connectors", sort 50) and rendered in `<x-noerd::profile-layout>`. It lists the servers the
+  every person) is a page of the core's profile area: its route carries `['noerd', 'profile']`,
+  the install/update command adds "My MCP Connectors" to `app-configs/profile/navigation.yml`
+  (`ensureProfileNavigation()`), and it renders `<x-noerd::profile-layout>`. It lists the servers the
   selected tenant may use with the URL to add in an assistant, and the person's connected OAuth
   clients (`Services\McpConnectors::forUser()` — live access tokens grouped by client, last use
   from the log); "Disconnect" revokes all their tokens of that client, refresh tokens included
@@ -83,7 +84,8 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
 ### Commands
 
 - `php artisan noerd:install-mcp` — publishes the YAML, offers the migrations, creates the Passport
-  keys when missing, adds "MCP Servers" and "MCP Access Log" to the setup navigation
+  keys when missing, adds "MCP Servers" and "MCP Access Log" to the setup navigation and "My MCP
+  Connectors" to the profile navigation
 - `php artisan noerd:update-mcp` — the same without migrations (picked up by `noerd:update-all`)
 - `php artisan noerd-mcp:prune-requests {--days=}` — log retention (default
   `noerd-mcp.log.retention_days`, 90)
