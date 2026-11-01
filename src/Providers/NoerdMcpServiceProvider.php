@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NoerdMcp\Providers;
 
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Mcp\Facades\Mcp;
 use Laravel\Passport\Passport;
@@ -82,6 +85,19 @@ class NoerdMcpServiceProvider extends NoerdModuleServiceProvider
 
         // The consent screen an MCP client (Claude) shows after the login.
         Passport::authorizationView(fn(array $parameters) => view('mcp::authorize', $parameters));
+
+        // A guest on the consent screen signs in on the noerd login first and
+        // returns to it afterwards (url.intended). Scoped to Passport's routes —
+        // the host's own guest redirect stays untouched.
+        $this->app->make(ExceptionHandler::class)->renderable(
+            function (AuthenticationException $exception, Request $request) {
+                if (! $request->expectsJson() && $request->routeIs('passport.*') && Route::has('noerd.login')) {
+                    return redirect()->guest(route('noerd.login'));
+                }
+
+                return null;
+            },
+        );
 
         // Every module registers its server in its own boot(): the routes are
         // added once all providers booted.

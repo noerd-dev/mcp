@@ -34,7 +34,9 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
   (`Models\McpUser extends NoerdUser implements OAuthenticatable` — the same `noerd_users` row),
   set at runtime unless the host defines it; `passport.guard` defaults to `noerd` (the consent
   screen runs on the signed-in session); `Passport::authorizationView()` renders laravel/mcp's
-  `mcp::authorize`. `Mcp::oauthRoutes()` (discovery + dynamic client registration) is throttled
+  `mcp::authorize`; a guest on a Passport route is sent to the noerd login and back
+  (`url.intended`, a renderable scoped to `passport.*` — the host's guest redirect stays untouched).
+  `Mcp::oauthRoutes()` (discovery + dynamic client registration) is throttled
   by `noerd-mcp.oauth.throttle`
 - The OAuth tables come with this package (`create_oauth_tables_for_mcp`, each only while
   missing). The key pair: `noerd:install-mcp` / `noerd:update-mcp` run `passport:keys` when there is
