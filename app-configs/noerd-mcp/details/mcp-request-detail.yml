@@ -1,0 +1,55 @@
+title: MCP Request
+description: 'One request of the MCP access log. The log is written by the application and read-only.'
+theme: display
+fields:
+  - name: detailData.created_at
+    label: Requested at
+    type: datetime
+    readonly: true
+    colspan: 6
+  - name: detailData.user_name
+    label: Person
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.client_name
+    label: MCP client
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.server_label
+    label: MCP Server
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.method
+    label: JSON-RPC method
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.tool
+    label: Tool
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.status_label
+    label: Status
+    type: text
+    readonly: true
+    colspan: 6
+  - name: detailData.duration_ms
+    label: Duration (ms)
+    type: number
+    readonly: true
+    colspan: 6
+  - name: detailData.error
+    label: Error message
+    type: text
+    readonly: true
+    hideIfEmpty: true
+    colspan: 12
+  - name: detailData.ip
+    label: IP address
+    type: text
+    readonly: true
+    colspan: 6

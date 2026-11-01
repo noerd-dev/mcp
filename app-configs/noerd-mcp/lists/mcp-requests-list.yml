@@ -1,0 +1,48 @@
+title: MCP Access Log
+description: 'Every request an MCP client (e.g. Claude) sent on behalf of a person of this company.'
+defaultSort:
+  field: created_at
+  direction: desc
+searchableColumns:
+  - tool
+  - client_name
+  - server
+disableSearch: false
+filters:
+  - label: Status
+    column: status
+    type: picklist
+    options:
+      - value: ok
+        label: OK
+      - value: error
+        label: Error
+      - value: refused
+        label: Refused
+columns:
+  - field: created_at
+    label: Requested at
+    type: datetime
+  - field: user_name
+    label: Person
+  - field: client_name
+    label: MCP client
+  - field: server_label
+    label: MCP Server
+  - field: tool
+    label: Tool
+  - field: method
+    label: JSON-RPC method
+  - field: status
+    label: Status
+    type: badge
+    options:
+      - value: ok
+        label: OK
+      - value: error
+        label: Error
+      - value: refused
+        label: Refused
+  - field: duration_ms
+    label: Duration (ms)
+    type: number
