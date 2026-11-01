@@ -1,0 +1,8 @@
+# Keep dist installs lean: ship only what consumers need at runtime.
+# NOT excluded on purpose: resources/boost/ (the Boost guideline) and
+# tests/Concerns + tests/Fixtures (reused by modules that test their servers).
+/tests/Feature      export-ignore
+/pint.json          export-ignore
+/composer.lock      export-ignore
+/.gitattributes     export-ignore
+/.gitignore         export-ignore

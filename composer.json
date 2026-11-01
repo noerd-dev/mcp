@@ -1,0 +1,27 @@
+{
+    "name": "noerd/mcp",
+    "description": "MCP servers for noerd applications: laravel/mcp with Passport OAuth for noerd users, a server registry, admin approval per tenant, an access log and the connectors of every user",
+    "type": "library",
+    "version": "v0.1.0",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.3",
+        "laravel/framework": "^12.0 || ^13.0",
+        "laravel/mcp": "^1.1",
+        "laravel/passport": "^13.10",
+        "noerd/noerd": "^0.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "NoerdMcp\\": "src/",
+            "NoerdMcp\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "NoerdMcp\\Providers\\NoerdMcpServiceProvider"
+            ]
+        }
+    }
+}
