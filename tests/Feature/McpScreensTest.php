@@ -6,6 +6,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Passport\Passport;
 use Livewire\Livewire;
 use Noerd\Enums\Profile;
+use Noerd\Helpers\TenantHelper;
+use Noerd\Middleware\ProfileMiddleware;
 use NoerdMcp\Enums\McpRequestStatus;
 use NoerdMcp\Models\McpRequest;
 use NoerdMcp\Models\McpServerSetting;
@@ -141,11 +143,11 @@ it('serves every screen by its route and shows a log entry with its arguments', 
         $this->get(route($route))->assertOk();
     }
 
-    // "My MCP Connectors" is a page of the profile area: its navigation lists
-    // the core's profile pages and marks this one.
-    $this->get(route('noerd-mcp.connectors'))
-        ->assertSee('href="' . route('noerd.profile') . '"', false)
-        ->assertSee('aria-current="page"', false);
+    // "My MCP Connectors" is a page of the profile area: its route selects
+    // the profile navigation.
+    $this->get(route('noerd-mcp.connectors'))->assertOk();
+
+    expect(TenantHelper::getSelectedApp())->toBe(ProfileMiddleware::APP);
 
     Livewire::test('noerd-mcp::mcp-request-detail', ['modelId' => $row->id])
         ->assertSee(['zz_echo', 'Müller GmbH'])

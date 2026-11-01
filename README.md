@@ -18,7 +18,8 @@ php artisan noerd:install-mcp
 ```
 
 Publishes the screen YAML, runs the migrations (Passport's OAuth tables are created when missing),
-creates Passport's key pair when there is none and adds the setup navigation entries. A deployment
+creates Passport's key pair when there is none, adds the setup navigation entries and "My MCP
+Connectors" to the profile navigation. A deployment
 keeps `storage/oauth-private.key` / `oauth-public.key` in its shared storage (or sets
 `PASSPORT_PRIVATE_KEY` / `PASSPORT_PUBLIC_KEY`). Schedule `noerd-mcp:prune-requests` for the log
 retention (`NOERD_MCP_LOG_RETENTION_DAYS`, default 90).

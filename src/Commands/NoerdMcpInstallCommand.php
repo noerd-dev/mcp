@@ -12,8 +12,9 @@ use Noerd\Commands\Concerns\InstallsNoerdModule;
 /**
  * Installs noerd/mcp, a support module without a tenant app: publishes the
  * YAML of its screens, offers the migrations (the OAuth tables included),
- * creates Passport's encryption keys when there are none and adds the admin
- * screens to the setup navigation.
+ * creates Passport's encryption keys when there are none, adds the admin
+ * screens to the setup navigation and "My MCP Connectors" to the profile
+ * navigation.
  */
 class NoerdMcpInstallCommand extends Command
 {
@@ -47,6 +48,12 @@ class NoerdMcpInstallCommand extends Command
             'title' => 'MCP Access Log',
             'route' => 'noerd-mcp.requests',
             'heroicon' => 'clipboard-document-list',
+        ]);
+
+        $this->ensureProfileNavigation('My Account', [
+            'title' => 'My MCP Connectors',
+            'route' => 'noerd-mcp.connectors',
+            'heroicon' => 'cpu-chip',
         ]);
     }
 

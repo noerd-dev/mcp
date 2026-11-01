@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Mcp\Facades\Mcp;
 use Laravel\Passport\Passport;
 use Noerd\Providers\NoerdModuleServiceProvider;
-use Noerd\Services\ProfileNavigationRegistry;
 use Noerd\Support\ComponentAccessGuard;
 use NoerdMcp\Commands\NoerdMcpInstallCommand;
 use NoerdMcp\Commands\NoerdMcpUpdateCommand;
@@ -78,10 +77,6 @@ class NoerdMcpServiceProvider extends NoerdModuleServiceProvider
     protected function bootModule(): void
     {
         ComponentAccessGuard::registerAdminComponents(self::ADMIN_COMPONENTS);
-
-        // Every person's own page in the profile area of the core.
-        $this->app->make(ProfileNavigationRegistry::class)
-            ->register('My MCP Connectors', 'noerd-mcp.connectors', 'cpu-chip', 50);
 
         // The consent screen an MCP client (Claude) shows after the login.
         Passport::authorizationView(fn(array $parameters) => view('mcp::authorize', $parameters));
