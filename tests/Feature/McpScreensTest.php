@@ -7,6 +7,7 @@ use Illuminate\Support\Js;
 use Laravel\Passport\Passport;
 use Livewire\Livewire;
 use Noerd\Enums\Profile;
+use Noerd\Helpers\NoerdAuth;
 use Noerd\Helpers\TenantHelper;
 use Noerd\Middleware\ProfileMiddleware;
 use NoerdMcp\Enums\McpRequestStatus;
@@ -58,7 +59,7 @@ function zzAccessToken(int $userId, string $clientId): string
 
 it('lets a tenant admin allow and forbid a server', function (): void {
     $admin = createNoerdUserForApp(self::ZZ_APP, profile: Profile::Admin);
-    $this->actingAs($admin);
+    $this->actingAs($admin, NoerdAuth::GUARD);
 
     Livewire::test('noerd-mcp::mcp-servers-page')
         ->assertSee('Zz Echo')
@@ -73,13 +74,13 @@ it('lets a tenant admin allow and forbid a server', function (): void {
 });
 
 it('never allows a server whose app the tenant does not run', function (): void {
-    $this->actingAs(createNoerdUserForApp('ZZOTHER', profile: Profile::Admin));
+    $this->actingAs(createNoerdUserForApp('ZZOTHER', profile: Profile::Admin), NoerdAuth::GUARD);
 
     Livewire::test('noerd-mcp::mcp-servers-page')->call('toggle', self::ZZ_SERVER)->assertForbidden();
 });
 
 it('keeps the admin screens closed to other people', function (string $component): void {
-    $this->actingAs(createNoerdUserForApp(self::ZZ_APP, profile: Profile::User));
+    $this->actingAs(createNoerdUserForApp(self::ZZ_APP, profile: Profile::User), NoerdAuth::GUARD);
 
     Livewire::test($component)->assertForbidden();
 })->with(['noerd-mcp::mcp-servers-page', 'noerd-mcp::mcp-requests-list']);
@@ -88,7 +89,7 @@ it('shows an admin the access log of the own tenant only', function (): void {
     // Created first: the fixture selects the tenant of the user it creates.
     $other = createNoerdUserForApp(self::ZZ_APP);
     $admin = createNoerdUserForApp(self::ZZ_APP, profile: Profile::Admin);
-    $this->actingAs($admin);
+    $this->actingAs($admin, NoerdAuth::GUARD);
 
     zzMcpLogRow((int) $admin->selected_tenant_id, ['tool' => 'own_tool']);
     zzMcpLogRow((int) $other->selected_tenant_id, ['tool' => 'foreign_tool']);
@@ -106,7 +107,7 @@ it('shows a person the allowed servers and their connected clients, and disconne
     $ownToken = zzAccessToken($user->id, $client->id);
     $foreignToken = zzAccessToken($someoneElse->id, $client->id);
 
-    $this->actingAs($user);
+    $this->actingAs($user, NoerdAuth::GUARD);
 
     Livewire::test('noerd-mcp::mcp-connectors-page')
         ->assertSee(['Zz Echo', url('mcp/' . self::ZZ_SERVER), 'Claude'])
@@ -119,7 +120,7 @@ it('shows a person the allowed servers and their connected clients, and disconne
 });
 
 it('does not offer a server the admin has not allowed', function (): void {
-    $this->actingAs(createNoerdUserForApp(self::ZZ_APP));
+    $this->actingAs(createNoerdUserForApp(self::ZZ_APP), NoerdAuth::GUARD);
 
     Livewire::test('noerd-mcp::mcp-connectors-page')->assertDontSee(url('mcp/' . self::ZZ_SERVER));
 });
@@ -139,7 +140,7 @@ it('prunes log entries older than the retention', function (): void {
 it('serves every screen by its route and shows a log entry with its arguments', function (): void {
     $admin = createNoerdUserForApp(self::ZZ_APP, profile: Profile::Admin);
     $row = zzMcpLogRow((int) $admin->selected_tenant_id, ['arguments' => ['customer' => 'Müller GmbH']]);
-    $this->actingAs($admin);
+    $this->actingAs($admin, NoerdAuth::GUARD);
 
     foreach (['noerd-mcp.servers', 'noerd-mcp.requests', 'noerd-mcp.connectors'] as $route) {
         $this->get(route($route))->assertOk();
