@@ -85,7 +85,7 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
 ### Commands
 
 - `php artisan noerd:install-mcp` — publishes the YAML, offers the migrations, creates the Passport
-  keys when missing, adds "MCP Servers" and "MCP Access Log" to the setup navigation and "My MCP
+  keys when missing, adds "MCP Server Admin" and "MCP Access Log" to the setup navigation and "My MCP
   Connectors" to the profile navigation
 - `php artisan noerd:update-mcp` — the same without migrations (picked up by `noerd:update-all`)
 - `php artisan noerd-mcp:prune-requests {--days=}` — log retention (default

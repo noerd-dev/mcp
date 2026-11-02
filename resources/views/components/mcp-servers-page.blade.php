@@ -68,7 +68,7 @@ new class extends Component {
 
 <x-noerd::page>
     <x-slot:header>
-        <x-noerd::modal-title>{{ __('MCP Servers') }}</x-noerd::modal-title>
+        <x-noerd::modal-title>{{ __('MCP Server Admin') }}</x-noerd::modal-title>
     </x-slot:header>
 
     <x-noerd::tab-content :layout="[]" :showBlock="false">
@@ -96,7 +96,7 @@ new class extends Component {
                                 id="mcp-server-{{ $server['key'] }}"
                                 :checked="$server['enabled']"
                                 :disabled="! $server['enabled'] && ! $server['app_usable']"
-                                wire:click="toggle(@js($server['key']))">
+                                wire:click="toggle({{ \Illuminate\Support\Js::from($server['key']) }})">
                                 {{ __('Allowed') }}
                             </x-noerd::checkbox>
                         </li>

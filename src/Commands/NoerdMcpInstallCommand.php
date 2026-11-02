@@ -39,7 +39,7 @@ class NoerdMcpInstallCommand extends Command
         $this->ensurePassportKeys();
 
         $this->ensureSetupNavigation('Administration', [
-            'title' => 'MCP Servers',
+            'title' => 'MCP Server Admin',
             'route' => 'noerd-mcp.servers',
             'heroicon' => 'cpu-chip',
         ]);

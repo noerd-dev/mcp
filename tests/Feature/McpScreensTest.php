@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Js;
 use Laravel\Passport\Passport;
 use Livewire\Livewire;
 use Noerd\Enums\Profile;
@@ -61,6 +62,7 @@ it('lets a tenant admin allow and forbid a server', function (): void {
 
     Livewire::test('noerd-mcp::mcp-servers-page')
         ->assertSee('Zz Echo')
+        ->assertSeeHtml('wire:click="toggle(' . e(Js::from(self::ZZ_SERVER)) . ')"')
         ->call('toggle', self::ZZ_SERVER);
 
     expect(McpServerSetting::isEnabled((int) $admin->selected_tenant_id, self::ZZ_SERVER))->toBeTrue();

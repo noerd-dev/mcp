@@ -4,7 +4,7 @@ MCP servers for noerd applications. Modules register their `laravel/mcp` server;
 serves each one at `/mcp/{key}` behind OAuth (Laravel Passport) for noerd users, in the company the
 person selected and with their permissions.
 
-- **Admins** allow the servers per company under Setup → Administration → **MCP Servers** (a server
+- **Admins** allow the servers per company under Setup → Administration → **MCP Server Admin** (a server
   is off until allowed) and see every access in the **MCP Access Log** (person, client, tool,
   arguments, result, duration).
 - **Every person** finds the server URLs for their assistant (e.g. Claude → Settings → Connectors)

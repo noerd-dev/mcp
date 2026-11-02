@@ -87,7 +87,7 @@ new class extends Component {
                     </div>
                 </li>
             @empty
-                <li class="px-4 py-4 text-sm text-zinc-500">{{ __('No MCP server is allowed for this company. An administrator can allow servers under Setup → MCP Servers.') }}</li>
+                <li class="px-4 py-4 text-sm text-zinc-500">{{ __('No MCP server is allowed for this company. An administrator can allow servers under Setup → MCP Server Admin.') }}</li>
             @endforelse
         </ul>
     </x-noerd::profile-section>
