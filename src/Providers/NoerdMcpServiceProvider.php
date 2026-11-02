@@ -68,8 +68,13 @@ class NoerdMcpServiceProvider extends NoerdModuleServiceProvider
         ]);
 
         // The person approves a client on Passport's consent screen while
-        // signed in to the application — on the noerd guard.
-        if (config('passport.guard') === null) {
+        // signed in to the application — on the noerd guard. Passport merges
+        // its own default (`web`) into the config, so "not set" cannot be
+        // told apart from that default: only a host that published
+        // config/passport.php keeps its guard. On `web` a person signed in
+        // to noerd counts as a guest there, is sent to the noerd login, which
+        // forwards a signed-in person to the apps — the consent never shows.
+        if (config('passport.guard') === null || ! file_exists($this->app->configPath('passport.php'))) {
             config(['passport.guard' => 'noerd']);
         }
     }
