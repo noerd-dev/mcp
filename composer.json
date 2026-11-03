@@ -2,7 +2,7 @@
     "name": "noerd/mcp",
     "description": "MCP servers for noerd applications: laravel/mcp with Passport OAuth for noerd users, a server registry, admin approval per tenant, an access log and the connectors of every user",
     "type": "library",
-    "version": "v0.1.1",
+    "version": "v0.1.2",
     "license": "MIT",
     "require": {
         "php": "^8.3",
