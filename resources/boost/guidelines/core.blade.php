@@ -48,8 +48,15 @@ The framework rules come from the `noerd/noerd` guideline — this block only ad
 - `Models\McpServerSetting` (`mcp_server_settings`, tenant + `server` key + `enabled`): a MISSING
   row means NOT allowed — a server goes live only once a tenant admin switched it on in
   `noerd-mcp::mcp-servers-page` (route `noerd-mcp.servers`, Setup → Administration). A server
-  whose apps the tenant does not run cannot be switched on. `Services\McpServerAccess` is the rule
-  the screens ask (`appUsable()`, `enabled()`, `availableFor()`); `ActAsNoerdUser` enforces it.
+  whose apps the tenant does not run cannot be switched on. Per server the admin also picks the
+  AUDIENCE (`mcp_server_settings.audience`, `Enums\McpServerAudience`): `all` (every person, the
+  default) or `selected` — only the people ticked on the same page (`mcp_server_users`, written by
+  `McpServerSetting::setUserAllowed()`; tenant admins and super admins ALWAYS may). A person leaving
+  the tenant loses the rows (`Listeners\ForgetMcpServerUsersOfRemovedMember` on
+  `TenantMemberRemoved`). `Services\McpServerAccess` is the ONE rule the screens ask
+  (`appUsable()`, `enabled()`, `allowsUser()`, `availableFor()` — for the signed-in person, so the
+  connectors page and the in-app assistant of noerd/agents follow it); `ActAsNoerdUser` enforces it
+  on every request, so taking a person off the list needs no token revocation.
   A module whose server existed before the approval allows it with a data migration of its own
   for the tenants already connected (accounting: `allow_accounting_mcp_server_for_connected_tenants`)
 - `Models\McpRequest` (`mcp_requests`, no `updated_at`) is written ONLY by

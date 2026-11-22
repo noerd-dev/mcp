@@ -7,14 +7,17 @@ namespace NoerdMcp\Providers;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Laravel\Mcp\Facades\Mcp;
 use Laravel\Passport\Passport;
+use Noerd\Events\TenantMemberRemoved;
 use Noerd\Providers\NoerdModuleServiceProvider;
 use Noerd\Support\ComponentAccessGuard;
 use NoerdMcp\Commands\NoerdMcpInstallCommand;
 use NoerdMcp\Commands\NoerdMcpUpdateCommand;
 use NoerdMcp\Commands\PruneMcpRequestsCommand;
+use NoerdMcp\Listeners\ForgetMcpServerUsersOfRemovedMember;
 use NoerdMcp\Models\McpUser;
 use NoerdMcp\Support\McpRoutes;
 use NoerdMcp\Support\McpServerRegistry;
@@ -82,6 +85,8 @@ class NoerdMcpServiceProvider extends NoerdModuleServiceProvider
     protected function bootModule(): void
     {
         ComponentAccessGuard::registerAdminComponents(self::ADMIN_COMPONENTS);
+
+        Event::listen(TenantMemberRemoved::class, ForgetMcpServerUsersOfRemovedMember::class);
 
         // The consent screen an MCP client (Claude) shows after the login.
         Passport::authorizationView(fn(array $parameters) => view('mcp::authorize', $parameters));

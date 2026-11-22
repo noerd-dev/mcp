@@ -39,5 +39,13 @@
     "Last used :date": "Zuletzt genutzt :date",
     "Disconnect this client? It has to ask for your consent again.": "Diesen Client trennen? Er muss Ihre Zustimmung erneut einholen.",
     "Disconnect": "Trennen",
-    "You have not connected any client yet.": "Sie haben noch keinen Client verbunden."
+    "You have not connected any client yet.": "Sie haben noch keinen Client verbunden.",
+    "An administrator has not allowed you to use the MCP server :server.": "Ein Administrator hat Ihnen den MCP-Server :server nicht freigegeben.",
+    "Who may use this server": "Wer diesen Server nutzen darf",
+    "All people of the company": "Alle Personen des Unternehmens",
+    "Selected people": "Ausgewählte Personen",
+    "Only the people ticked here may connect to this server. Administrators always may.": "Nur die hier angehakten Personen dürfen sich mit diesem Server verbinden. Administratoren dürfen es immer.",
+    "Search people": "Personen suchen",
+    "Always allowed (administrator)": "Immer freigegeben (Administrator)",
+    "No person found.": "Keine Person gefunden."
 }

@@ -10,7 +10,10 @@ use Noerd\Enums\Profile;
 use Noerd\Helpers\NoerdAuth;
 use Noerd\Helpers\TenantHelper;
 use Noerd\Middleware\ProfileMiddleware;
+use Noerd\Models\NoerdUser;
+use Noerd\Models\Tenant;
 use NoerdMcp\Enums\McpRequestStatus;
+use NoerdMcp\Enums\McpServerAudience;
 use NoerdMcp\Models\McpRequest;
 use NoerdMcp\Models\McpServerSetting;
 use NoerdMcp\Tests\Concerns\InteractsWithMcpFixtures;
@@ -71,6 +74,52 @@ it('lets a tenant admin allow and forbid a server', function (): void {
     Livewire::test('noerd-mcp::mcp-servers-page')->call('toggle', self::ZZ_SERVER);
 
     expect(McpServerSetting::isEnabled((int) $admin->selected_tenant_id, self::ZZ_SERVER))->toBeFalse();
+});
+
+it('lets a tenant admin open a server to selected people and tick them', function (): void {
+    $admin = createNoerdUserForApp(self::ZZ_APP, profile: Profile::Admin);
+    $tenantId = (int) $admin->selected_tenant_id;
+    $member = NoerdUser::factory()->create(['name' => 'Zz Member']);
+    Tenant::query()->findOrFail($tenantId)->addMember($member, Profile::User->value);
+    McpServerSetting::set($tenantId, self::ZZ_SERVER, true);
+    $this->actingAs($admin, NoerdAuth::GUARD);
+
+    Livewire::test('noerd-mcp::mcp-servers-page')
+        ->call('setAudience', self::ZZ_SERVER, McpServerAudience::SelectedUsers->value)
+        ->assertSee(['Zz Member', __('Always allowed (administrator)')])
+        ->call('toggleUser', self::ZZ_SERVER, $member->id);
+
+    expect(McpServerSetting::audienceFor($tenantId, self::ZZ_SERVER))->toBe(McpServerAudience::SelectedUsers)
+        ->and(McpServerSetting::allowedUserIds($tenantId, self::ZZ_SERVER))->toBe([$member->id])
+        ->and(McpServerSetting::isEnabled($tenantId, self::ZZ_SERVER))->toBeTrue();
+
+    Livewire::test('noerd-mcp::mcp-servers-page')->call('toggleUser', self::ZZ_SERVER, $member->id);
+
+    expect(McpServerSetting::allowedUserIds($tenantId, self::ZZ_SERVER))->toBe([]);
+});
+
+it('never selects a person outside the tenant', function (): void {
+    $stranger = createNoerdUserForApp(self::ZZ_APP);
+    $admin = createNoerdUserForApp(self::ZZ_APP, profile: Profile::Admin);
+    $this->actingAs($admin, NoerdAuth::GUARD);
+
+    Livewire::test('noerd-mcp::mcp-servers-page')->call('toggleUser', self::ZZ_SERVER, $stranger->id)->assertNotFound();
+
+    expect(McpServerSetting::allowedUserIds((int) $admin->selected_tenant_id, self::ZZ_SERVER))->toBe([]);
+});
+
+it('does not offer a server open to selected people only to a person not selected', function (): void {
+    $user = createNoerdUserForApp(self::ZZ_APP);
+    $tenantId = (int) $user->selected_tenant_id;
+    McpServerSetting::set($tenantId, self::ZZ_SERVER, true);
+    McpServerSetting::setAudience($tenantId, self::ZZ_SERVER, McpServerAudience::SelectedUsers);
+    $this->actingAs($user, NoerdAuth::GUARD);
+
+    Livewire::test('noerd-mcp::mcp-connectors-page')->assertDontSee(url('mcp/' . self::ZZ_SERVER));
+
+    McpServerSetting::setUserAllowed($tenantId, self::ZZ_SERVER, $user->id, true);
+
+    Livewire::test('noerd-mcp::mcp-connectors-page')->assertSee(url('mcp/' . self::ZZ_SERVER));
 });
 
 it('never allows a server whose app the tenant does not run', function (): void {

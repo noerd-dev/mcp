@@ -7,11 +7,10 @@ namespace NoerdMcp\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Noerd\Helpers\AccessHelper;
 use Noerd\Helpers\NoerdAuth;
 use Noerd\Helpers\TenantHelper;
 use Noerd\Models\NoerdUser;
-use NoerdMcp\Models\McpServerSetting;
+use NoerdMcp\Services\McpServerAccess;
 use NoerdMcp\Support\McpServerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,7 +29,10 @@ class ActAsNoerdUser
 
     public const string USER_ATTRIBUTE = 'noerd-mcp.user_id';
 
-    public function __construct(private readonly McpServerRegistry $registry) {}
+    public function __construct(
+        private readonly McpServerRegistry $registry,
+        private readonly McpServerAccess $access,
+    ) {}
 
     public function handle(Request $request, Closure $next, string $server): Response
     {
@@ -66,13 +68,19 @@ class ActAsNoerdUser
         session()->put('noerd.selected_tenant_id', $tenantId);
         TenantHelper::clearCache();
 
-        if (! AccessHelper::canUseApp(...$definition->apps)) {
+        if (! $this->access->appUsable($definition)) {
             return response()->json(['message' => __('You are not allowed to use :server.', ['server' => __($definition->label)])], 403);
         }
 
-        if (! McpServerSetting::isEnabled($tenantId, $definition->key)) {
+        if (! $this->access->enabled($tenantId, $definition)) {
             return response()->json([
                 'message' => __('An administrator has not allowed the MCP server :server for this company.', ['server' => __($definition->label)]),
+            ], 403);
+        }
+
+        if (! $this->access->allowsUser($tenantId, $definition, $user)) {
+            return response()->json([
+                'message' => __('An administrator has not allowed you to use the MCP server :server.', ['server' => __($definition->label)]),
             ], 403);
         }
 

@@ -3,11 +3,16 @@
 declare(strict_types=1);
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Noerd\Enums\Profile;
 use Noerd\Models\NoerdUser;
 use Noerd\Models\Tenant;
 use NoerdMcp\Enums\McpRequestStatus;
+use NoerdMcp\Enums\McpServerAudience;
 use NoerdMcp\Models\McpRequest;
 use NoerdMcp\Models\McpServerSetting;
+use NoerdMcp\Models\McpServerUser;
+use NoerdMcp\Services\McpServerAccess;
+use NoerdMcp\Support\McpServerRegistry;
 use NoerdMcp\Tests\Concerns\InteractsWithMcpFixtures;
 use Tests\TestCase;
 
@@ -115,4 +120,63 @@ it('refuses a person without a selected tenant', function (): void {
     $this->zzCallTool('zz_echo')->assertForbidden();
 
     expect(McpRequest::query()->acrossTenants()->sole()->tenant_id)->toBeNull();
+});
+
+it('refuses a person the admin did not select when the server is open to selected people only', function (): void {
+    McpServerSetting::set($this->tenantId, self::ZZ_SERVER, true);
+    McpServerSetting::setAudience($this->tenantId, self::ZZ_SERVER, McpServerAudience::SelectedUsers);
+    $this->zzActAsMcpUser($this->user->id);
+
+    $this->zzCallTool('zz_echo', ['text' => 'hi'])->assertForbidden();
+
+    $log = McpRequest::query()->ofTenant($this->tenantId)->sole();
+
+    expect($log->status)->toBe(McpRequestStatus::Refused)
+        ->and($log->error)->toContain('not allowed you');
+});
+
+it('lets a selected person use a server open to selected people only', function (): void {
+    McpServerSetting::set($this->tenantId, self::ZZ_SERVER, true);
+    McpServerSetting::setAudience($this->tenantId, self::ZZ_SERVER, McpServerAudience::SelectedUsers);
+    McpServerSetting::setUserAllowed($this->tenantId, self::ZZ_SERVER, $this->user->id, true);
+    $this->zzActAsMcpUser($this->user->id);
+
+    $this->zzCallTool('zz_echo', ['text' => 'hello'])->assertOk()->assertSee('hello');
+});
+
+it('always lets a tenant admin in, selected or not', function (): void {
+    $admin = NoerdUser::factory()->create();
+    Tenant::query()->findOrFail($this->tenantId)->addMember($admin, Profile::Admin->value);
+    $admin->setting->update(['selected_tenant_id' => $this->tenantId, 'locale' => 'en']);
+    McpServerSetting::set($this->tenantId, self::ZZ_SERVER, true);
+    McpServerSetting::setAudience($this->tenantId, self::ZZ_SERVER, McpServerAudience::SelectedUsers);
+    $this->zzActAsMcpUser($admin->id);
+
+    $this->zzCallTool('zz_echo', ['text' => 'hello'])->assertOk();
+});
+
+it('offers a server open to selected people only to the people selected', function (): void {
+    $definition = app(McpServerRegistry::class)->find(self::ZZ_SERVER);
+    $access = app(McpServerAccess::class);
+    McpServerSetting::set($this->tenantId, self::ZZ_SERVER, true);
+    $this->actingAs($this->user, \Noerd\Helpers\NoerdAuth::GUARD);
+
+    expect($access->availableFor($this->tenantId))->toHaveCount(1);
+
+    McpServerSetting::setAudience($this->tenantId, self::ZZ_SERVER, McpServerAudience::SelectedUsers);
+
+    expect($access->availableFor($this->tenantId))->toBe([])
+        ->and($access->allowsUser($this->tenantId, $definition, $this->user))->toBeFalse();
+
+    McpServerSetting::setUserAllowed($this->tenantId, self::ZZ_SERVER, $this->user->id, true);
+
+    expect($access->availableFor($this->tenantId))->toHaveCount(1);
+});
+
+it('forgets the selection of a person who leaves the tenant', function (): void {
+    McpServerSetting::setUserAllowed($this->tenantId, self::ZZ_SERVER, $this->user->id, true);
+
+    Tenant::query()->findOrFail($this->tenantId)->removeMember($this->user);
+
+    expect(McpServerUser::query()->acrossTenants()->count())->toBe(0);
 });

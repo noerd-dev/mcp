@@ -5,7 +5,8 @@ serves each one at `/mcp/{key}` behind OAuth (Laravel Passport) for noerd users,
 person selected and with their permissions.
 
 - **Admins** allow the servers per company under Setup → Administration → **MCP Server Admin** (a server
-  is off until allowed) and see every access in the **MCP Access Log** (person, client, tool,
+  is off until allowed), open each one to all people of the company or only to the people they
+  tick (administrators always may), and see every access in the **MCP Access Log** (person, client, tool,
   arguments, result, duration).
 - **Every person** finds the server URLs for their assistant (e.g. Claude → Settings → Connectors)
   and their connected clients under **My MCP Connectors** (`/noerd/user/mcp-connectors`, a page of the profile area), where they can
